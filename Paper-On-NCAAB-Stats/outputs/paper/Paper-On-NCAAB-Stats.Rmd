@@ -27,9 +27,7 @@ In this paper, we attempt to answer this intriguing question by analyzing a vari
 
 Unfortunately, there are some implications with these findings. 
 
-The rest of this paper will be as follows: Section \@ref(data) goes over the datasets being used in the paper, and analyzes the data with the use of tables and graphs to see which team statistics have a relationship with winning percentage. Section \@ref(model)
-
-
+The rest of this paper will be as follows: Section \@ref(data) goes over the datasets being used in the paper, and analyzes the data with the use of tables and graphs to see which team statistics have a relationship with winning percentage. Section \@ref(model) includes the creation of a linear regression model that uses only the most important team statistics as explanatory variables to predict winning percentage, the response variable that determines team success. Section \@ref(results) interprets the coefficients and provides a statistical analysis of the model in order to understand what is being done. Finally, Section \@ref(discussion) discusses what exactly the model and its outcome is telling us, what can be learned from it, and what implications come along with the findings.
 
 # Data
 
