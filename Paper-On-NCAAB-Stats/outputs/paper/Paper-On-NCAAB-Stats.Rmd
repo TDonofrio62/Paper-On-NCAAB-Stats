@@ -5,7 +5,7 @@ author:
   - Thomas D'Onofrio
 thanks: "Code and data are available at: https://github.com/TDonofrio62/Paper-On-NCAAB-Stats."
 date: "`r format(Sys.time(), '%d %B %Y')`"
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "The March Madness college basketball tournament is one of the most exciting sports events in the world due to the intense games, unpredictable results, and the creation of brackets by millions. In this paper, data displaying each college basketball schools’ advanced team statistics was used to create a linear model with team winning percentage as the response variable, where the explanatory variables are the team statistics that play the largest factor in leading to team success. It was found that [insert statistics here once model has been created] are the most important team statistics that affect the amount of wins a team gets the most, meaning fans can use these statistics to fill out their brackets more successfully. Unfortunately, the data is slightly biased due to inconsistent scorekeeping across teams and arenas, and the racial biases of referees when calling fouls, causing some implications to the findings."
 output:
   bookdown::pdf_document2
 toc: FALSE
@@ -16,7 +16,8 @@ bibliography: references.bib
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
-library(palmerpenguins)
+library(dplyr)
+library(knitr)
 ```
 
 # Introduction
@@ -25,7 +26,7 @@ March is a very exciting time for sports fans in the US and many other countries
 
 In this paper, we attempt to answer this intriguing question by analyzing a variety datasets from the college basketball section of Sports Reference [@citeSR], using R [@citeR]. Datasets containing college basketball statistics from 2017 to 2020 were used, where each dataset contains many different advanced team statistics for each NCAA Division 1 school with a Men's basketball team in a specific season. The data was first graphically analyzed to determine which team statistics have a strong or noticeable relationship with how many games a team wins. These statistics were then used to create a linear model that attempts to predict winning percentage, the response variable that is being used to measure team success, where only the best and most necessary team statistics were included. As a result of this, it was determined that the following statistics [Insert statistics here once model is completed], play the most important factor in leading to team success. Thus, when filling out their brackets, fans can compare these statistics across teams to determine which teams have a good chance of going far or even winning the tournament, as opposed to just looking at wins or their seeding like many people do.
 
-Unfortunately, there are some implications with these findings. 
+Unfortunately, there are some implications with these findings. There appears to be several aspects of bias in the datasets being used. For one, there is a lot of human error in the tracking of statistics by scorekeepers, causing certain ambiguously defined statistics in the data to be incorrectly tracked and thus skewed [@citeWilliams]. This means that data is tracked differently for each team in the league in their respective arenas, made evident by Madison Square Garden’s scorekeepers overstating the quality of shots in the NHL [@citeMcCurdy]. Thus, the data for some teams may be biased, making them look either better or worse relative to the other teams in the league. There is also unfortunate racial biases in basketball, as referees tend to show racism by calling more fouls on players with different races than them, leading to these teams scoring less points in games where this racial injustice occurs [@citeWolfers]. With more white referees in the league, teams with more white players may have team statistics skewed to make them seem better than they truly are, where teams with more players of colour will look worse because of the bias. We must be aware that our findings have been affected by these biases and as a result may not be perfectly correct. Nevertheless, a lot can be learned from the datasets which are still quite informative. 
 
 The rest of this paper will be as follows: Section \@ref(data) goes over the datasets being used in the paper, and analyzes the data with the use of tables and graphs to see which team statistics have a relationship with winning percentage. Section \@ref(model) includes the creation of a linear regression model that uses only the most important team statistics as explanatory variables to predict winning percentage, the response variable that determines team success. Section \@ref(results) interprets the coefficients and provides a statistical analysis of the model in order to understand what is being done. Finally, Section \@ref(discussion) discusses what exactly the model and its outcome is telling us, what can be learned from it, and what implications come along with the findings.
 
