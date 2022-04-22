@@ -16,6 +16,7 @@ bibliography: references.bib
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+#Load in libraries
 library(tidyverse)
 library(dplyr)
 library(knitr)
@@ -53,7 +54,9 @@ ncaab_stats %>%
   slice(20,112,630,702,785,791,1107,1221,1493,1558) %>%
   kable(
     caption= "10 Observations from dataset of NCAA Basketball team statistics",
-    col.names = c("Year", "School", "Over .500", "SRS", "Pace", "O-rating", "3pa Rate", "TS %", "TRB %", "AST %", "STL %", "BLK %", "TOV %", "ORB %"),
+    col.names = c("Year", "School", "Over .500", "SRS", "Pace", "O-rating",
+                  "3pa Rate", "TS %", "TRB %", "AST %", "STL %", "BLK %",
+                  "TOV %", "ORB %"),
     booktabs = TRUE,
     linesep = "",
     align = c('c')
@@ -68,6 +71,7 @@ All the variables to the right of SRS in Table \@ref(tab:dataextract) are the te
 
 ```{r srshist, echo = FALSE, message=FALSE, fig.cap="Distribution of Simple Rating System for NCAA Basketball teams"}
 
+#create histogram for our response variable, simple rating system, and add in vertical lines displaying the mean and median of the variable
 ncaab_stats %>%
   ggplot(aes(x = srs)) + 
   geom_histogram(bins = 50, fill = "dodgerblue1", colour = "black") +
@@ -86,6 +90,10 @@ ncaab_stats %>%
 Figure \@ref(fig:srshist) shows the distribution of our response variable simple rating system. It can be seen that the variable is close to resembling a normal distribution based on its shape, and even a standard normal distribution since it is almost centered around 0. The distribution is slightly skewed to the right, evident by the larger mean (red line) than median (orange line), and the mode being lower than both. There are also some noticeable outliers on the negative side of the distribution, which may be dragging the mean down lower than it would be without them. Even with the skew, it seems that there are close to similar amounts of teams with postive and negative SRS's, which makes sense as the better half of the league will often beat the worse half of the league, making the better teams have positive ratings and the poorer teams have negative ratings.Overall, the fact that SRS is almost a normal distribution if not for the slight skew is a good sign that our model will be able to predict the variable successfully. One of the most important model assumptions the Normality assumption stating the models errors must be normally distributed. This is more likely to occur when the response is normally distributed, and thus it is likely we will not have to make any transformation on our variable to get more accurate and trustworthy results.
 
 ```{r, include=FALSE}
+
+#Create 10 scatter plots, each one showing the relationship between simple rating system and a certain team statistic that may be used in the model
+#Colour the plot points based on whether a team had a record above .500 or not
+#Save each plot separately so they can be combined later
 scatter1 <- ncaab_stats %>%
   ggplot(aes(x = pace, y = srs, colour = over_500)) +
   geom_point()+
@@ -179,7 +187,11 @@ scatter10 <- ncaab_stats %>%
 
 ```{r scatters, echo=FALSE, fig.width=12, fig.height=12, fig.cap="Relationship between Simple Rating System and several adcanced team statistics, coloured by whether a schools winning % was above .500 or not", fig.pos="H"}
 
-ggarrange(scatter1, scatter2, scatter3, scatter4, scatter5, scatter6, scatter7, scatter8, scatter9, scatter10, ncol=3, nrow=4, common.legend = TRUE, legend="bottom")
+#Combine all 10 scatter plots into one figure, with a common legend for each of them displaying how the coloured points differ
+
+ggarrange(scatter1, scatter2, scatter3, scatter4, scatter5, scatter6, scatter7,
+          scatter8, scatter9, scatter10, ncol=3, nrow=4,
+          common.legend = TRUE, legend="bottom")
 
 ```
 
@@ -195,12 +207,66 @@ The remaining 6 variables from the dataset that were plotted, pace, 3-point atte
 So, none of these 6 variables will be considered for the model, and only offensive rating, true shooting percentage, total rebound percentage, and turnover percentage will potentially be used to predict simple rating system, our response variable, and help us determine what leads to team success.
 
 ```{r summarytab, echo=FALSE}
-ncaab_stats %>% select(srs, o_rtg, ts_percent, trb_percent, tov_percent) %>% datasummary_skim(histogram=FALSE, output = "kableExtra", title="Summary statistics of important variables") %>% kable_styling(latex_options= "hold_position")
+#Create a summary table for the response variable and the main important statistics that may be used in the model
+
+ncaab_stats %>% 
+  select(srs, o_rtg, ts_percent, trb_percent, tov_percent) %>% 
+  datasummary_skim(histogram=FALSE, output = "kableExtra", 
+                   title="Summary statistics of important variables") %>% 
+  kable_styling(latex_options= "hold_position")
 ```
-Table \@ref(tab:summarytab) shows several summary statistics of each of the statistics that will be considered for the model, including the response. Unique shows the number of different unique values for each team statistic. Missing shows the percent of values missing in the data for each variable, and each one is 0 since all NA values were removed in the initial cleaning process of the dataset. The noteworthy statistics included in the table are mean, standard deviation, mininum, median, and maximum.
+Table \@ref(tab:summarytab) shows several summary statistics of each of the statistics that will be considered for the model, including the response. Unique shows the number of different unique values for each team statistic. Missing shows the percent of values missing in the data for each variable, and each one is 0 since all NA values were removed in the initial cleaning process of the dataset. The noteworthy statistics included in the table are mean, standard deviation, mininum, median, and maximum. We once again see how simple rating system has a mean and median quite close together and is centered very close to one, showing how the distribution is only slightly skewed and is close to being a normal distribution. With a standard deviation of just over 10, there is a decent amount of spread in the distribution but nothing too substantial. The larger max and min may cause some impliations in the future but only minimally.
 
+All the potential explanatory team statistics seem to have little to no skew at all as the mean and median of each variable is exactly the same, as they are 0.5 for true shooting percentage, 50.3 for total rebound percentage and 16.2 for turnover percentage, except for offensive rating whose mean and median only differ by 0.1 (102.9 and 103). Each variable also seems to have fairly reasonably low standard deviations, meaning no variable has a spread too high that will affect our model. Based on the maximum's and minimum's, there does not seem to be any crazy high or low values that are serious outliers and would skew our results too drastically either, so overall the data looks quite good.
 
+```{r, include = FALSE}
 
+#Create 4 histograms, each one showing the distribution of one of the main important team statistics that may be used in the model
+#Save each plot separately so they can be combined later
+
+hist1 <- ncaab_stats %>%
+  ggplot(aes(x = o_rtg)) + 
+  geom_histogram(bins = 50, fill = "aquamarine1", colour = "black") +
+  theme(legend.position = "none")+
+  labs(x = "Offensive Rating",
+       y = "Count") +
+  theme_minimal()
+
+hist2 <- ncaab_stats %>%
+  ggplot(aes(x = ts_percent)) + 
+  geom_histogram(bins = 50, fill = "deepskyblue", colour = "black") +
+  theme(legend.position = "none")+
+  labs(x = "True Shooting Percentage",
+       y = "Count") +
+  theme_minimal()
+
+hist3 <- ncaab_stats %>%
+  ggplot(aes(x = trb_percent)) + 
+  geom_histogram(bins = 50, fill = "lightblue2", colour = "black") +
+  theme(legend.position = "none")+
+  labs(x = "Total Rebound Percentage",
+       y = "Count") +
+  theme_minimal()
+
+hist4 <- ncaab_stats %>%
+  ggplot(aes(x = tov_percent)) + 
+  geom_histogram(bins = 50, fill = "steelblue3", colour = "black") +
+  theme(legend.position = "none")+
+  labs(x = "Turnover Percentage",
+       y = "Count") +
+  theme_minimal()
+```
+
+```{r histograms, echo=FALSE, fig.cap="Distributions for important team statistics that affect a college basketball teams success", fig.pos="H"}
+
+#Combine all 4 histograms into one figure
+
+ggarrange(hist1,hist2,hist3,hist4, ncol=2, nrow=2)
+
+```
+Figure \@ref(fig:histograms) shows the distributions for each of these important team statistics that may be used as predictor variables, which allows us to more easily and visually see what was learned in the summary table. It can be seen that each variable seems to very closely resemble normal distributions, where they are centered around their mean and are fairly symmetric on both sides of it. Of course they are not perfectly symmetric as that would be near impossible, but the overall shape of the distributions are still very similar to that of a normal distribution. Offensive rating and total rebound percentage have a slight tail to the left of the distributions skewing them slightly to the left, and true shooting percentage and turnover percentage are the opposite where they are slightly skewed to the right due to their tails. However, they tails are quite small and not too noticeable, so the distributions on not skewed very much, which is evident by the means and medians of each variable being the exact same or nearly the same. Additionally, although there are some points at the end of the tails that may alter the distribution slightly, we can now more clearly see that there does not seem to be any substantially large outliers for any of the variables that would skew results too drastically. All in all, these team statistics should make for great explanatory variables and should not cause any issues in our model.
+
+Now that our dataset and the variables within it have been looked at and analyzed through the use of numeric tables and visualizations, we understand what exactly we are working with and can being to create our model that will help answer our research question.
 
 # Model
 
