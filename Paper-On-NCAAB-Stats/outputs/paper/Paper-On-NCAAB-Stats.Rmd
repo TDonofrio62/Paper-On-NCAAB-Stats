@@ -18,6 +18,9 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(dplyr)
 library(knitr)
+library(kableExtra)
+library(ggpubr)
+library(modelsummary)
 ```
 
 # Introduction
@@ -32,35 +35,138 @@ The rest of this paper will be as follows: Section \@ref(data) goes over the dat
 
 # Data
 
-Our data is of penguins (Figure \@ref(fig:bills)).
+```{r dataextract, echo = FALSE, message=FALSE}
+#Load in dataset
+ncaab_stats <- read_csv(here::here("inputs/data/ncaab_stats.csv"))
 
-```{r bills, fig.cap="Bills of penguins", echo = FALSE}
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = FALSE) +
-  theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
+#Show a brief extract of the dataset by selecting 10 observations in a table
+ncaab_stats %>% 
+  slice(20,112,630,702,785,791,1107,1221,1493,1558) %>%
+  kable(
+    caption= "10 Observations from dataset of NCAA Basketball team statistics",
+    col.names = c("Year", "School", "Over .500", "SRS", "Pace", "O-rating", "3pa Rate", "TS %", "TRB %", "AST %", "STL %", "BLK %", "TOV %", "ORB %"),
+    booktabs = TRUE,
+    linesep = "",
+    align = c('c')
+  ) %>% 
+  kable_styling(latex_options="scale_down")
+  
 ```
 
-Talk more about it.
-
-Also bills and their average (Figure \@ref(fig:billssssss)). (Notice how you can change the height and width so they don't take the whole page?)
-
-```{r billssssss, fig.cap="More bills of penguins", echo = FALSE, fig.width=8, fig.height=4}
-
-# This needs to be about the random data tha tI sasmpled?
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = FALSE) +
+```{r srshist, echo = FALSE, message=FALSE, fig.cap= "Distribution of Simple Rating System for NCAA Basketball teams"}
+ncaab_stats %>%
+  ggplot(aes(x = srs)) + 
+  geom_histogram(bins = 50, fill = "dodgerblue1", colour = "black") +
+  theme(legend.position = "none")+
+  labs(x = "Simple Rating System",
+       y = "Count") +
   theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
+  geom_vline(aes(xintercept = mean(srs)), col="red")
+
 ```
 
-Talk way more about it. 
+```{r scatters, echo=FALSE, fig.width=12, fig.height=12, fig.cap= "Relationship between Simple Rating System and several adcanced team statistics, coloured by whether a schools winning % was above .500 or not"}
+scatter1 <- ncaab_stats %>%
+  ggplot(aes(x = pace, y = srs, colour = over_500)) +
+  geom_point()+
+  theme_bw() +
+  labs(x = "Pace",
+       y = "Simple Rating System",
+       colour = "Over .500"
+       )
+
+scatter2 <- ncaab_stats %>%
+  ggplot(aes(x = o_rtg, y = srs, colour = over_500)) +
+  geom_point()+
+  theme_bw() +
+  labs(x = "Offensive Rating",
+       y = "Simple Rating System",
+       colour = "Over .500"
+       )
+
+scatter3 <- ncaab_stats %>%
+  ggplot(aes(x = `3pa_rate`, y = srs, colour = over_500)) +
+  geom_point()+
+  theme_bw() +
+  labs(x = "3-Point Attempt Rate",
+       y = "Simple Rating System",
+       colour = "Over .500"
+       )
+
+scatter4 <- ncaab_stats %>%
+  ggplot(aes(x = ts_percent, y = srs, colour = over_500)) +
+  geom_point()+
+  theme_bw() +
+  labs(x = "True Shooting %",
+       y = "Simple Rating System",
+       colour = "Over .500"
+       )
+
+scatter5 <- ncaab_stats %>%
+  ggplot(aes(x = trb_percent, y = srs, colour = over_500)) +
+  geom_point()+
+  theme_bw() +
+  labs(x = "Total Rebound %",
+       y = "Simple Rating System",
+       colour = "Over .500"
+       )
+
+scatter6 <- ncaab_stats %>%
+  ggplot(aes(x = ast_percent, y = srs, colour = over_500)) +
+  geom_point()+
+  theme_bw() +
+  labs(x = "Assist %",
+       y = "Simple Rating System",
+       colour = "Over .500"
+       )
+
+scatter7 <- ncaab_stats %>%
+  ggplot(aes(x = stl_percent, y = srs, colour = over_500)) +
+  geom_point()+
+  theme_bw() +
+  labs(x = "Steal %",
+       y = "Simple Rating System",
+       colour = "Over .500"
+       )
+
+scatter8 <- ncaab_stats %>%
+  ggplot(aes(x = blk_percent, y = srs, colour = over_500)) +
+  geom_point()+
+  theme_bw() +
+  labs(x = "Block %",
+       y = "Simple Rating System",
+       colour = "Over .500"
+       )
+
+scatter9 <- ncaab_stats %>%
+  ggplot(aes(x = tov_percent, y = srs, colour = over_500)) +
+  geom_point()+
+  theme_bw() +
+  labs(x = "Turnover %",
+       y = "Simple Rating System",
+       colour = "Over .500"
+       )
+
+scatter10 <- ncaab_stats %>%
+  ggplot(aes(x = orb_percent, y = srs, colour = over_500)) +
+  geom_point()+
+  theme_bw() +
+  labs(x = "Offensive Rebound %",
+       y = "Simple Rating System",
+       colour = "Over .500"
+       )
+ggarrange(scatter1, scatter2, scatter3, scatter4, scatter5, scatter6, scatter7, scatter8, scatter9, scatter10, ncol=3, nrow=4, common.legend = TRUE, legend="bottom")
+```
+
+```{r summarytab, fig.cap = "Summary statistics of important team variables"}
+ncaab_stats %>% select(srs, o_rtg, ts_percent, trb_percent, tov_percent) %>% datasummary_skim()
+```
+
+
+```{r}
+ncaab_stats %>% select(srs, o_rtg, ts_percent, trb_percent, tov_percent) %>% datasummary_correlation()
+```
+
 
 
 

@@ -27,8 +27,9 @@ ncaab_stats_unclean <- rbind(year_17_18, year_18_19, year_19_20, year_20_21, yea
 
 ncaab_stats <- ncaab_stats_unclean %>% 
   clean_names() %>% 
-  drop_na(school) %>% 
-  select(c(1,2,6,7,22,23,25,26,27,28,29,30,32,33)) %>% 
+  drop_na(school, w_l_percent) %>% 
+  mutate(over_500 = ifelse(w_l_percent >= 0.5, TRUE, FALSE)) %>% 
+  select(c(1,2,35,7,22,23,25,26,27,28,29,30,32,33)) %>% 
   rename(`3pa_rate` = `x3p_ar`)
 
 # Write as csv
