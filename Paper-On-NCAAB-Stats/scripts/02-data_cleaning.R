@@ -9,26 +9,31 @@
 # Use R Projects, not setwd().
 library(haven)
 library(tidyverse)
+library(janitor)
 
 # Read in the raw data. 
-year1718 <- read_csv("inputs/data/2017-18 ncaab stats.csv")
-year1819 <- read_csv("inputs/data/2018-19 ncaab stats.csv")
-year1920 <- read_csv("inputs/data/2019-20 ncaab stats.csv")
-year2021 <- read_csv("inputs/data/2020-21 ncaab stats.csv")
-year2122 <- read_csv("inputs/data/2021-22 ncaab stats.csv")
+year_17_18 <- read_csv("inputs/data/2017-18 ncaab stats.csv")
+year_18_19 <- read_csv("inputs/data/2018-19 ncaab stats.csv")
+year_19_20 <- read_csv("inputs/data/2019-20 ncaab stats.csv")
+year_20_21 <- read_csv("inputs/data/2020-21 ncaab stats.csv")
+year_21_22 <- read_csv("inputs/data/2021-22 ncaab stats.csv")
 
-# Just keep some variables that may be of interest (change 
-# this depending on your interests)
-names(raw_data)
 
-reduced_data <- 
-  raw_data %>% 
-  select(first_col, 
-         second_col)
-rm(raw_data)
-         
+#Merge Datasets
 
-#### What's next? ####
+ncaab_stats_unclean <- rbind(year_17_18, year_18_19, year_19_20, year_20_21, year_21_22)
+
+#Clean Dataset
+
+ncaab_stats <- ncaab_stats_unclean %>% 
+  clean_names() %>% 
+  drop_na(school) %>% 
+  select(c(1,2,6,7,22,23,25,26,27,28,29,30,32,33)) %>% 
+  rename(`3pa_rate` = `x3p_ar`)
+
+# Write as csv
+
+write_csv(ncaab_stats, "inputs/data/ncaab_stats.csv")
 
 
 
