@@ -30,7 +30,8 @@ ncaab_stats <- ncaab_stats_unclean %>%
   drop_na(school, w_l_percent) %>% 
   mutate(over_500 = ifelse(w_l_percent >= 0.5, TRUE, FALSE)) %>% 
   select(c(1,2,35,7,22,23,25,26,27,28,29,30,32,33)) %>% 
-  rename(`3pa_rate` = `x3p_ar`)
+  rename(`3pa_rate` = `x3p_ar`) %>%
+  mutate(ts_percent = ts_percent*100)
 
 # Write as csv
 
