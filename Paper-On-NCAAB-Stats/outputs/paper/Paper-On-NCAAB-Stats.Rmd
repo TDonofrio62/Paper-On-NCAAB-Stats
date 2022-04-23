@@ -293,9 +293,9 @@ digraph {
 ```
 In the DAG, it can be seen how true shooting percentage, total rebound percentage, and turnover percentage all affect and have causality with simple rating system. It can also be seen that offensive rating affects simple rating system too, but it is also affected by the three variables listed above and is being used as a mediator between these variables and simple rating system. As this mediator, offensive rating is explaining exactly why these three variables affect simple rating system [@citeBhandari]. The three variables affect team success because the three variables cause teams to either score more or less points on offense, giving them either a better or worse offensive rating, and thus causing them to either win or lose more games, which is essentially what the DAG is explaining. As a result of this, offensive rating should not be used in the model as the mediator will affect the strength of the relationship between the true predictor variables and simple rating system.
 
-With the final three predictor variables, there are 7 possible combinations that can be used as predictors for a linear regression model. We can then test these models against one another to determine which model is the best at predicting simple rating system, and the variables used in the model will be the main team statistics that affect how much success a college basketball team has.
+With the final three predictor variables, there are 7 possible combinations that can be used as predictors for a linear regression model. We can then test these models against one another to determine which model is the best at predicting simple rating system, and the variables used in the model will be the main team statistics that affect how much success a college basketball team has. Before creating the models and testing them, we must first split our data into two groups, a training group and a testing group. This is done to ensure we do not overfit our model, which would make it difficult for our model to be applied to other datasets and accurately make predictions on different data [@citeRohan]. The training data will be used to actually build and fit the model, and thus is also used to get our parameter estimates. As a result of this, the data should be split in a way that the training dataset is larger, allowing it could make more accurate estimates, and thus an 80:20 split has been chosen. The testing data will be used later on to validate our model and see if it can be used to make predictions on different datasets than the one used to build it.
 
-```{r}
+```{r, echo = FALSE}
 library(tidymodels)
 
 set.seed(9917)
@@ -310,6 +310,7 @@ ncaab_stats_test <- testing(ncaab_stats_split)
 
 ```
 
+Using our training dataset, the seven different models were created, one with all three final variables included, three with two of the variables included, and three where one variable is used as a single predictor. We can then obtain the values of several different goodness of fit and maximum-likelihood measures that tell us how well each model fits the data. Table \@ref(tab:gof) displays the estimated coefficients of each potential final model, and the several different goodness of fit measures that were aforementioned, where each column represents a different model. Based on the measurements in the table, it seems as if the largest model that uses true shooting percentage, total rebound percentage, and turnover percentage is the best possible model. 
 
 ```{r, include=FALSE}
 mods <- list(
@@ -326,9 +327,31 @@ mods <- list(
 ```{r gof, echo=FALSE}
 modelsummary(mods,
              output = "kableExtra",
+             statistic = "se = {std.error}",
+             gof_omit = "Num.Obs.|Log.Lik.|F",
              fmt = 2,
              title = "Comparing goodness of fit measures of several potential models predicting Simple Rating System. Column names represent which variables are included in each model.")
 ```
+
+The estimated coefficients are not of too much use when comparing the models, and the coefficients of the final model will be analyzed in \@ref(results). The standard errors of the estimates are of use to us though, as a smaller standard error means the model has estimated the parameters more precisely. The model with all three variables used has the lowest standard error for each of the slope coefficients, showing it is doing the best job at estimating these parameters. It's intercept standard error is quite high on the contrary, which is expected since it is the largest model with several predictors in use. Next, the $R^2$ and $R^2_{adj}$ measures also point to the largest model being the best. The measures describe how much of the variance in our response is explained by the model, with $R^2_{adj}$ penalizing larger models since more predictors causes $R^2$ to increase. Even with the penalty, the model with all three variables still has the highest value at 0.511, which is 0.05 points higher than the next best model, meaning it fits the data much better than the rest. Ideally that number would be closer to 1, but explaining over half of the varation still makes the model fairly successful. Additionally, the Aikake's Information Criterion (AIC) and Bayesian Information Criteria (BIC) log-likelihood based measures also point towards the most complex model being the best. These measures tell us how well the model fits the data, while also penalizing models with more parameters, with BIC having a stronger penalty than AIC [@citePrabhat]. Even as the largest model and being penalized the most, the model will all three variable once again has the best results, as both its AIC and BIC are much lower than each of the other models values, and it is not particularly close. While it already fairly evident the full model is the best, looking at the Root Mean Squared Error (RMSE) only backs up this claim further. The RMSE is the variance of all the models residuals, and shows us how close the models predicted fitted values are to the actual points in our data [@citeGM]. A lower RMSE means a model has less error and fits the data much better. The largest model once again has the lowest value at 7.29, which is significantly better than the next best model, and further shows that this model fits the data the best and should be used as the final model. The only model that comes relatively close to the full model is the one with total rebound percentage and turnover percentage, as it proved to be the second best model for each of the measurements, with the second highest $R^2$ and $R^2_{adj}$, and second lowest AIC, BIC, and RMSE values. While its measurements were fairly good and it was considered as a possibility for the final model, the model with all three variables still was better in each measurement and by a significantly large amount as well, making it the clear and obvious choice to be used as our final model.
+
+So, now that we know which variables will be included in the final and best model, the form of our final model can be seen below.
+
+$$\hat{y_i} = \hat{\beta_{0}} + \hat{\beta_{1}}x_1 + \hat{\beta_{2}}x_2 + \hat{\beta_{3}}x_3 + {\epsilon} $$
+where:
+- $\hat{y_i}$ represents the predicted value of SRS given specific values of the predictor variables
+- $\hat{\beta_{0}}$ is the estimated intercept coefficient
+- $x_1$ represents the predictor variable of True Shooting Percentage
+- $\hat{\beta_{1}}$ is the estimated slope coefficient for True Shooting Percentage
+- $x_2$ represents the predictor variable of Total Rebound Percentage
+- $\hat{\beta_{2}}$ is the estimated slope coefficient for Total Rebound Percentage
+- $x_3$ represents the predictor variable of Turnover Percentage
+- $\hat{\beta_{3}}$ is the estimated slope coefficient for Turnover Percentage
+- and $\epsilon$ is an error term
+
+Essentially, the model works by plugging in values of our predictor variables for the x's, and then based these given values and the intercept and slope coeffcients, the model will predict what a teams Simple Rating System Value will be. In Section \@ref(results), we will analyze the results of the model and its parameters, plug the coefficient parameters into the model, and interpret what exactly the model means.
+
+# Results
 
 ```{r}
 fitted_and_resids <- 
@@ -372,20 +395,6 @@ assump_plot5 <- ggplot(fitted_and_resids, aes(x = srs, .fitted)) +
 ```{r assumplots, fig.height=8, fig.cap="Residuals and Fitted Value plots for linear regression model predicting Simple Rating System using a training dataset on college basketball statistics}
 ggarrange(assump_plot1,assump_plot5,assump_plot2,assump_plot3, assump_plot4, ncol=2, nrow=3)
 ```
-
-
-\begin{equation}
-Pr(\theta | y) = \frac{Pr(y | \theta) Pr(\theta)}{Pr(y)}  (\#eq:bayes)
-\end{equation}
-
-Equation \@ref(eq:bayes) seems useful, eh?
-
-Here's a dumb example of how to use some references: In paper we run our analysis in `R` [@citeR]. We also use the `tidyverse` which was written by @thereferencecanbewhatever If we were interested in baseball data then @citeLahman could be useful. 
-
-We can use maths by including latex between dollar signs, for instance $\theta$.
-
-
-# Results
 
 # Discussion
 
