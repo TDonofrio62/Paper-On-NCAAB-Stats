@@ -23,6 +23,9 @@ library(knitr)
 library(kableExtra)
 library(ggpubr)
 library(modelsummary)
+library(DiagrammeR)
+library(tidymodels)
+library(broom)
 ```
 
 # Introduction
@@ -43,7 +46,7 @@ Of the websites abundance of data, we will only be working with team statistics 
 
 While the data given by Sports Reference is very accurate and comes from a reliable source, there are some issues with the tracking of this data that must be considered as they may cause future implications. Sports data in general is often inaccurate as it is all recorded by scorekeepers who are prone to both human error and having biases. This is especially true for basketball, as there is a lot of ambiguity in the definitions of certain statistics such as assists, blocks, and steals, meaning different scorekeepers interpret them in different ways [@citeWilliams]. This causes some team score keepers to either under count or over count certain statistics, and skew the results away from their true values, causing bias in the tracked data.  A particularly notable example of scorekeepers tracking data incorrectly due to human error is seen in the National Hockey League. Popular arena Madison Square Garden (MSG), home to the New York Rangers, and its scorekeepers for are known to track shot locations far too close towards the net. This causes them to extremely overstate the quality of the shots in games played at MSG, measured with the statistic “Expected Goals” predicting the chance of a shot resulting in a goal, relative to the other arenas in the league [@citeMcCurdy]. As a result of this, the Rangers team statistics are often extremely biased and skewed to show them having stronger offensive and goaltending performances, and weaker defensive performances [@citeMcCurdy].  It is likely that situations like this also occur in college basketball, especially considering some NCAA basketball games are played at MSG as well and would cause our data to be biased. Finally, there is known racial bias in basketball and data may not be tracked ethically. Studies have shown that the referees in the National Basketball Association call less fouls against players who share the same race as them, and more fouls against those who are a different race, ultimately causing players of the same race to score more points in the game being played [@citeWolfers]. This likely goes for NCAA basketball as well and may be even worse since it is a lower and non-professional level of play. Considering there typically are more white referees than other races in basketball, due to the makeup of the US population, this is problematic and unfair towards players of colour. This racial inequality could mean that teams with a larger white makeup will have team statistics skewed positively since they will receive more calls and thus score more points, and those with more players of colour will have negatively skewed team statistics.
 
-Even with these biases, the data should not be affected too substantially, and information can still be learned by analyzing it. This can be done using packages such as Tidyverse [@citeTidyverse], Dplyr [@citeDplyr], MASS [@citeMASS], and more in R [@citeR], where the data will be looked at graphically and modeled to answer the research question and tell a story about which team statistics play the biggest factor in team success. Before getting to the modeling, we ust first take a deeper look into the data that we will be using to do so.
+Even with these biases, the data should not be affected too substantially, and information can still be learned by analyzing it. This can be done using packages such as Tidyverse [@citeTidyverse], Dplyr [@citeDplyr], modelsummary [@citeMS], and more in R [@citeR], where the data will be looked at graphically and modeled to answer the research question and tell a story about which team statistics play the biggest factor in team success. Before getting to the modeling, we ust first take a deeper look into the data that we will be using to do so.
 
 ```{r dataextract, echo = FALSE, message=FALSE}
 #Load in dataset
@@ -269,6 +272,107 @@ Figure \@ref(fig:histograms) shows the distributions for each of these important
 Now that our dataset and the variables within it have been looked at and analyzed through the use of numeric tables and visualizations, we understand what exactly we are working with and can being to create our model that will help answer our research question.
 
 # Model
+
+While we do have four strong candidate explanatory variables that may be used in the model, we still must decide what combination of these variables will make for the best possible model. First, it is a good idea to think logically if each of these variables should be included in the model, and the variable in particular we should analyze is offensive rating. Based on the visualizations analyzed in Section \@ref(data), it is clear that there is a relationship between offensive rating and a teams simple rating system, but that does not necessarily mean there is direct causality. Of course if a team scores more points and has a higher offensive rating, they will win more games and have a higher simple rating system value, but a high offensive rating is not what is causing a team to have success. It is instead underlying statistics that cause a team to score more points and thus have a higher simple rating system value. These underlying statistics, such as true shooting percentage, total rebounding percentage, and turnover percentage, affect both offensive rating and simple rating system and thus make it seem like offensive rating and SRS have a causal relationship. For example, teams with a higher true shooting percentages will hit more of their shots causing them to score more points, leading to a higher offensive rating, and thus causing them to win more games by larger amounts, and have a higher SRS value. So, these statistics are the true variables affecting simple rating system, and offensive rating is actually just acting as a mediator for the relationship between them. This relationship can be shown through the use of directed acrylic graphs (DAGs) created with DiagrammeR [@citeDiagramme], seen in Figure \@ref(fig:dags).
+
+```{r dags, echo=FALSE, fig.cap="A DAG showing Offensive Rating as a mediator}
+DiagrammeR::grViz("
+digraph {
+  graph [ranksep = 0.2]
+  node [shape = plaintext, fontsize = 10, fontname = Helvetica]
+    A [label = 'True Shooting % / Total Rebound % / Turnover %']
+    B [label = 'Offensive Rating']
+    C [label = 'Simple Rating System']
+  edge [minlen = 2, arrowhead = vee]
+    A -> C
+    A -> B
+    B->C
+  { rank = same; A; C}
+}
+", height = 300)
+```
+In the DAG, it can be seen how true shooting percentage, total rebound percentage, and turnover percentage all affect and have causality with simple rating system. It can also be seen that offensive rating affects simple rating system too, but it is also affected by the three variables listed above and is being used as a mediator between these variables and simple rating system. As this mediator, offensive rating is explaining exactly why these three variables affect simple rating system [@citeBhandari]. The three variables affect team success because the three variables cause teams to either score more or less points on offense, giving them either a better or worse offensive rating, and thus causing them to either win or lose more games, which is essentially what the DAG is explaining. As a result of this, offensive rating should not be used in the model as the mediator will affect the strength of the relationship between the true predictor variables and simple rating system.
+
+With the final three predictor variables, there are 7 possible combinations that can be used as predictors for a linear regression model. We can then test these models against one another to determine which model is the best at predicting simple rating system, and the variables used in the model will be the main team statistics that affect how much success a college basketball team has.
+
+```{r}
+library(tidymodels)
+
+set.seed(9917)
+
+ncaab_stats_split <- 
+  initial_split(data = ncaab_stats, 
+                prop = 0.80)
+
+ncaab_stats_train <- training(ncaab_stats_split)
+  
+ncaab_stats_test <- testing(ncaab_stats_split)
+
+```
+
+
+```{r, include=FALSE}
+mods <- list(
+  "mod_ts_trb_tov" = lm(srs ~ ts_percent + trb_percent + tov_percent, data = ncaab_stats_train),
+  "mod_ts_trb" = lm(srs ~ ts_percent + trb_percent, data = ncaab_stats_train),
+  "mod_ts_tov" = lm(srs ~ ts_percent + tov_percent, data = ncaab_stats_train),
+  "mod_trb_tov" = lm(srs ~ trb_percent + tov_percent, data = ncaab_stats_train),
+  "mod_ts" = lm(srs ~ ts_percent, data = ncaab_stats_train),
+  "mod_trb" = lm(srs ~ trb_percent, data = ncaab_stats_train),
+  "mod_tov" = lm(srs ~ tov_percent, data = ncaab_stats_train)
+)
+```
+
+```{r gof, echo=FALSE}
+modelsummary(mods,
+             output = "kableExtra",
+             fmt = 2,
+             title = "Comparing goodness of fit measures of several potential models predicting Simple Rating System. Column names represent which variables are included in each model.")
+```
+
+```{r}
+fitted_and_resids <- 
+  augment(mod_ts_trb_tov,
+          data = ncaab_stats_train)
+
+assump_plot1 <- ggplot(fitted_and_resids, aes(x = .resid)) + 
+  geom_histogram(binwidth = 0.5, fill="black", colour="gray") +
+  theme_classic() +
+  labs(y = "Number of occurrences",
+       x = "Residuals")
+
+assump_plot2 <- ggplot(fitted_and_resids, aes(x = ts_percent, y = .resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dotted", color = "grey") +
+  theme_classic() +
+  labs(y = "Residuals",
+       x = "True Shooting %")
+
+assump_plot3 <- ggplot(fitted_and_resids, aes(x = trb_percent, y = .resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dotted", color = "grey") +
+  theme_classic() +
+  labs(y = "Residuals",
+       x = "Total Rebound %")
+
+assump_plot4 <- ggplot(fitted_and_resids, aes(x = tov_percent, y = .resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dotted", color = "grey") +
+  theme_classic() +
+  labs(y = "Residuals",
+       x = "Turnover %")
+
+assump_plot5 <- ggplot(fitted_and_resids, aes(x = srs, .fitted)) + 
+  geom_point() +
+  theme_classic() +
+  labs(y = "Estimated Simple Rating System",
+       x = "Actual Simple Rating System")
+```
+
+```{r assumplots, fig.height=8, fig.cap="Residuals and Fitted Value plots for linear regression model predicting Simple Rating System using a training dataset on college basketball statistics}
+ggarrange(assump_plot1,assump_plot5,assump_plot2,assump_plot3, assump_plot4, ncol=2, nrow=3)
+```
+
 
 \begin{equation}
 Pr(\theta | y) = \frac{Pr(y | \theta) Pr(\theta)}{Pr(y)}  (\#eq:bayes)
