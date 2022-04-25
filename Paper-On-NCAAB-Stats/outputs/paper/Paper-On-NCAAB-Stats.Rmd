@@ -22,10 +22,15 @@ library(dplyr)
 library(knitr)
 library(kableExtra)
 library(ggpubr)
+#install.packages("modelsummary")
 library(modelsummary)
+#install.packages("DiagrammeR")
 library(DiagrammeR)
+#install.packages("tidymodels")
 library(tidymodels)
+#install.packages("broom")
 library(broom)
+library(plot3D)
 ```
 
 # Introduction
@@ -276,6 +281,8 @@ Now that our dataset and the variables within it have been looked at and analyze
 While we do have four strong candidate explanatory variables that may be used in the model, we still must decide what combination of these variables will make for the best possible model. First, it is a good idea to think logically if each of these variables should be included in the model, and the variable in particular we should analyze is offensive rating. Based on the visualizations analyzed in Section \@ref(data), it is clear that there is a relationship between offensive rating and a teams simple rating system, but that does not necessarily mean there is direct causality. Of course if a team scores more points and has a higher offensive rating, they will win more games and have a higher simple rating system value, but a high offensive rating is not what is causing a team to have success. It is instead underlying statistics that cause a team to score more points and thus have a higher simple rating system value. These underlying statistics, such as true shooting percentage, total rebounding percentage, and turnover percentage, affect both offensive rating and simple rating system and thus make it seem like offensive rating and SRS have a causal relationship. For example, teams with a higher true shooting percentages will hit more of their shots causing them to score more points, leading to a higher offensive rating, and thus causing them to win more games by larger amounts, and have a higher SRS value. So, these statistics are the true variables affecting simple rating system, and offensive rating is actually just acting as a mediator for the relationship between them. This relationship can be shown through the use of directed acrylic graphs (DAGs) created with DiagrammeR [@citeDiagramme], seen in Figure \@ref(fig:dags).
 
 ```{r dags, echo=FALSE, fig.cap="A DAG showing Offensive Rating as a mediator"}
+#Create Dag with arrow point from predictor variables to both simple rating system and offensive rating, then another arrow from offensive rating to SRS
+
 DiagrammeR::grViz("
 digraph {
   graph [ranksep = 0.2]
@@ -296,7 +303,8 @@ In the DAG, it can be seen how true shooting percentage, total rebound percentag
 With the final three predictor variables, there are 7 possible combinations that can be used as predictors for a linear regression model. We can then test these models against one another to determine which model is the best at predicting simple rating system, and the variables used in the model will be the main team statistics that affect how much success a college basketball team has. Before creating the models and testing them, we must first split our data into two groups, a training group and a testing group. This is done to ensure we do not overfit our model, which would make it difficult for our model to be applied to other datasets and accurately make predictions on different data [@citeRohan]. The training data will be used to actually build and fit the model, and thus is also used to get our parameter estimates. As a result of this, the data should be split in a way that the training dataset is larger, allowing it could make more accurate estimates, and thus an 80:20 split has been chosen. The testing data will be used later on to validate our model and see if it can be used to make predictions on different datasets than the one used to build it.
 
 ```{r, echo = FALSE}
-library(tidymodels)
+#Split the dataset into a two different ones, one for training and one to test the model
+#Split it 80:20
 
 set.seed(9917)
 
@@ -313,6 +321,10 @@ ncaab_stats_test <- testing(ncaab_stats_split)
 Using our training dataset, the seven different models were created, one with all three final variables included, three with two of the variables included, and three where one variable is used as a single predictor. We can then obtain the values of several different goodness of fit and maximum-likelihood measures that tell us how well each model fits the data. Table \@ref(tab:gof) displays the estimated coefficients of each potential final model, and the several different goodness of fit measures that were aforementioned, where each column represents a different model. Based on the measurements in the table, it seems as if the largest model that uses true shooting percentage, total rebound percentage, and turnover percentage is the best possible model. 
 
 ```{r, include=FALSE}
+#Create seven different models using our remaining three potential predictor variables
+#Name each model based on which variables are included in it
+#Assign all models to a single variable for later use
+
 mods <- list(
   "mod_ts_trb_tov" = lm(srs ~ ts_percent + trb_percent + tov_percent, data = ncaab_stats_train),
   "mod_ts_trb" = lm(srs ~ ts_percent + trb_percent, data = ncaab_stats_train),
@@ -325,6 +337,7 @@ mods <- list(
 ```
 
 ```{r gof, echo=FALSE}
+#Create a summary table including parameter statistics and goodness of fit measures for each of the models
 modelsummary(mods,
              output = "kableExtra",
              statistic = "se = {std.error}",
@@ -348,7 +361,7 @@ where:
 * _$\hat{\beta_{2}}$ is the estimated slope coefficient for Total Rebound Percentage_
 * _$x_3$ represents the predictor variable of Turnover Percentage_
 * _$\hat{\beta_{3}}$ is the estimated slope coefficient for Turnover Percentage_
-* _and $\epsilon$ is an error term_
+* _and $\epsilon$ is an error term which shoud be 0 assuming our model is unbiased_ 
 
 Essentially, the model works by plugging in values of our predictor variables for the x's, and then based these given values and the intercept and slope coeffcients, the model will predict what a teams Simple Rating System Value will be. In Section \@ref(results), we will analyze the results of the model and its parameters, plug the coefficient parameters into the model, and interpret what exactly the model means.
 
@@ -378,23 +391,26 @@ kable_styling(latex_options= "hold_position")
 
 Table \@ref(tab:coefsum) displays the results of our models estimated parameter statistics. It displays each of the estimated coefficient values, the 95% confidence interval for each estimated coefficient, and a p-value stating the significance of each variable. The parameters can be interpreted in order for us to better understand the relationship between the three predictor variables used in the model and Simple Rating System, or a college basketballs team success, shown in the model, and this is especially true for the estimated coefficients. The intercept coefficient of -98.62 tells us what a teams SRS will be if all predicted variable values are equal to zero. So, if in a given season a team hits 0% of their shots, grabs 0% of all possible rebounds, and turns the ball over in 0% of their positions, they will have a Simple Rating System value of -98.62. This is a reasonable intercept value as if a team hits no shots they will score no points, and by grabbing no rebounds they will give the other team many chances to score, so the team will lose many games by a large amount, resulting in the predicted very low SRS value. Of course it is near impossible for a team to have a season where they do not make a shot, do not grab a rebound, and never turn the ball over, but this is just a baseline value that helps us understand how the model works.
 
-WRITE MODEL HERE MAYBE AND TALK ABOUT HOW YOU ADD VALUES TO PREDICT SRS
-
 Next, the slope coefficient for the true shooting percentage variable is 0.92, meaning that when all other predictor variables are held at a fixed value, if true shooting percentage increases by 1% then their simple rating system will increase by 0.92. Total rebound percentage has a slope coefficient even larger at 1.63. This coefficient value of 1.63 can be interpreted as how much a teams simple rating system increases by when their total rebound percentage goes up 1% and all other variables are fixed. Both of these coefficients make sense as simple rating system will logically increase if a team shoots more efficiently and scores more points or if they grab more rebounds and get more attempts to score that their opposition, which was already determined by looking at the relation graphically earlier. The estimated slope coefficient for turnover percentage is different from the other as it is negative, with a value of -2.04. This lines up with what was seen in the graphical analysis as simple rating system and turnover percentage have a negative relationship, since turning the ball over more will allow the other team to score more and lead to a worse SRS. This negative value tells us that when a teams turnover percentage increases by 1% and all other variables are held fixed, the teams simple rating system value will decrease by 2.04 units.
+
+We can plug all these coefficients into the $\beta's$ in the formula explained in Section \@ref(model) to get the completed formula for our final model, $\hat{y_i} = -98.62 + 0.92x_1 + 1.63x_2 - 2.04x_3$. Doing so makes our model much easier to interpret. In order to estimate what a teams simple rating system value would be, you plug in their true shooting percentage for $x_1$, their total rebound percentage for $x_2$, and their turnover percentage for $x_3$, and the output of $\hat{y_i}$ would be their rating. For example, if a team has a true shooting percentage of 50%, a total rebounding percentage of 40%, and a turnover percentage of 20%, the model estimates that their simple rating system would be $\hat{y_i} = -98.62 + 0.92(50) + 1.63(40) - 2.04(20) = -28.22 $. This shows how the model can successfully predict a teams success with the use of advanced team statistics such as our predictor variables that were used, answering the research question.
 
 Table \@ref(tab:coefsum) also contains 95% confidence intervals. These intervals give us a range of plausible values for each estimate coefficient, and we are 95% certain that the true population parameter value is within this interval. For example, the true shooting percentage slope coefficient can reasonably be any value between 0.77 and 1.07, and our estimate coeffcient value of 0.92 for true shooting percentage falls right in the middle of this range. There is a chance this interval does not capture the true value but it is unlikely, as if we took 100 samples of college basketball data and created models, only 95% of the models and their confidence intervals for the estimated coefficients would capture the true population values. Fortunately, each of the estimated slope coefficients confidence intervals are quite narrow, as the lower and upper bounds only differ by 0.3, 0.31, and 0.45 respectively. The narrowness of the intervals is good as it means that our estimated coefficients are most likely quite accurate, and any coefficients and their confidence intervals that are estimated from other samples would give values very similar to the ones obtained from our sample that was used [@citeBassett]. The intercept coefficient also has a fairly narrow confidence interval as well, from -109.25 to -87.98, even if it may not seem like it relative to the other coefficients. This is because it is not dealing with percentage variables like the slope coefficient and instead has to do with simple rating system which has a wider range of values.
 
 The final value in the summary table is the p-value of each estimated coefficient, which tell us how significant each estimated coefficient is. A low p-value, and one below 0.05 in particular, for a variables coefficient means that there is evidence against a null hypothesis stating the coefficient should be zero as the variable does not affect the response in the presence of the other variables in the model. Looking at the p-values for our coefficients, they are all extremely small and are very close to 0, meaning the null hypothesis is rejected and thus each of the coefficients are significant and belong in the model. However, this information must taken with a grain of salt, as p-values are difficult to work with since they assume all model assumptions are satisfied and the data was properly collected and cleaned [@citeRohan]. As a result of this, no decisions were made based on these values, but they do provide us with a piece of information that allow us to further see that the decision we did make are likely good ones due to their low values.
 
-```{r}
-library(plot3D)
+The relationship between simple rating system and our three explanatory variables can also be visualized despite being a 4D relationship, thanks to the package plot3D [@citePlot3D].
+
+```{r 3d, echo=FALSE, fig.cap="4D plot showing the relationship between the models response variable, Simple Rating System, and its three predictor variables"}
 
 scatter3D(ncaab_stats_train$ts_percent, ncaab_stats_train$trb_percent, ncaab_stats_train$srs, colvar = ncaab_stats_train$tov_percent, bty = 'b2',
           pch = 19, cex = 0.5, xlab = "TS%", ylab = "TRB%", zlab = "SRS", clab = "TOV%", ticktype = "detailed", )
 ```
+Figure \@ref(fig:3d) shows this relationship through the use of a 3D plot, which is technically a 4D plot based on the use of a colour gradient to show a 4th variable. The vertical z-axis represents our response variable SRS, the x-axis closest to the viewer represents true shooting percentage, and the remaining y-axis on the right represents total rebound percentage. Also, the colour gradient is used to represent turnover percentage where each point is coloured in differently based on its turnover percentage value, giving the plot its 4th dimension. 
 
+Although it is difficult, it can be seen that the overall trend of the points moves from the bottom left of the plot towards the top right of the plot. So, as true shooting percentage increases along the x-axis and the points move right, simple rating system increases since the points are also moving upwards. Additionally, as total rebound percentage increases up the y-axis, simple rating system increases as well since the points are moving from the bottom of the z-axis to the top. Finally, the points towards the bottom of the plot where SRS is low are mostly red, orange and yellow. Then as SRS increases, the points gradually become more green and then more blue. This final dimension shows that as turnover percentage decreases and the colours go from red to blue, simple rating system increases. Each of these relationships shown by the 4D plot line up with what has been seen in both the graphical analysis and the analysis of the models parameter statistics. It should be noted that all three of these relationships are in the presence of the other predictor variables, and when you combine them all together you get the upwards trend and colour change from red to blue seen in the plot, which shows us the overall relationship estimated by the model.
 
-
+Before going over what we have learned from our model, there are two things that must be done. First, we need to check to see if all of the assumptions that where made with respect to the model were all satisfied, or else there will be some serious limitations to our findings. Then, we need to use our testing dataset to validate our model and see if these results can be used to make predictions on other datasets.
 
 ```{r, echo=FALSE}
 fitted_and_resids <- 
@@ -439,7 +455,18 @@ assump_plot5 <- ggplot(fitted_and_resids, aes(x = srs, .fitted)) +
 ggarrange(assump_plot1,assump_plot5,assump_plot2,assump_plot3, assump_plot4, ncol=2, nrow=3)
 ```
 
+The first assumption is the linearity assumption where all explanatory variables must have a linear relationship with the response, and this was confirmed to be true in Section \@ref(data) through the use of scatter plots. The explanatory variables also should not have a strong linear relationship with each other, and this was also already considered and dealt with earlier through the use of DAGs in Section \@ref(model). The next three assumptions will be checked using the plots in Figure \@ref(fig:assumplots). The next assumptions is the independence errors assumptions, as errors should be independent of one another and show no correlation. The bottom three plots in Figure \@ref(fig:assumplots), which show the relationship between each predictor variable and the models residuals, prove that this assumption is satisfied. This is because the points are all randomly scattered around a horizontal line at 0 on the y-axis for each one of the three plots, and there are no separated groups of points or noticeable trends that would suggest any correlation in the residuals. The third assumption is the homoscedasticity of errors assumption which simply means the models residual errors have constant variance. The plot in the top right of the figure shows the residuals have constant variance since the points have an upwards trend along an invisible diagonal line, meaning that variance is mostly similar and constant across all fitted values. Finally, the last assumption states that the errors should be normally distributed. The histogram in the top left of Figure \@ref(fig:assumplots) is used to see if this assumption is satisfied, and it should show a normal distribution if it is. The histogram has a distribution very similar to the distribution of our response variable simple rating system, which we previously determined that despite being slightly right skewed, the distribution is very close to being a normal distribution centered around its mean. This seems to be the case here as well, and while it is not perfect, it is still very close to being so, meaning it should not cause many issues with our model, if any at all, and the assumption can be considered satisfied.
 
+```{r, include=FALSE}
+test_predictions <- predict(final_model, newdata = ncaab_stats_test)
+
+prediction_error <- ncaab_stats_test$srs - test_predictions
+
+rmse_predictions <- sqrt(mean(prediction_error^2))
+
+```
+
+Finally, our model must be validated using the testing dataset. One way to do this is by making predictions on the test dataset, using the values of the explanatory variables in the data. We then calculate the RMSE using the errors between the predicted values and actual values of the testing data, and compare it to the RMSE of the original model built with the training data []. After using the model to make predictions on the testing data, it was found that the predicted values had a RMSE of 7.74. This is very similar to the original models RMSE based on the training data, which was 7.29. Since these values are very similar to one another, it means that our model did a good job at predicting values using the testing dataset, and thus it should also successfully be able to make predictions on other datasets, like for example future college basketball seasons. This means that the model has successfully been validated using the testing dataset, and we can now analyze what exactly was learned from our model.
 
 
 # Discussion
