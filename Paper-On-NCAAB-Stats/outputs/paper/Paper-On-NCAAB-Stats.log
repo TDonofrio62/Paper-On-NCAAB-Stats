@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2022.3.18)  23 APR 2022 21:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2022.3.18)  25 APR 2022 17:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -746,14 +746,14 @@ has been already used, duplicate ignored
                                                   \fi \fi 
 l.201 
        <./Paper-On-NCAAB-Stats_files/figure-latex/srshist-1.pdf>]
-<Paper-On-NCAAB-Stats_files/figure-latex/scatters-1.pdf, id=54, 867.24pt x 867.
-24pt>
+<Paper-On-NCAAB-Stats_files/figure-latex/scatters-1.pdf, id=54, 722.7pt x 722.7
+pt>
 File: Paper-On-NCAAB-Stats_files/figure-latex/scatters-1.pdf Graphic file (type
  pdf)
 <use Paper-On-NCAAB-Stats_files/figure-latex/scatters-1.pdf>
 Package pdftex.def Info: Paper-On-NCAAB-Stats_files/figure-latex/scatters-1.pdf
   used on input line 204.
-(pdftex.def)             Requested size: 469.75827pt x 469.75827pt.
+(pdftex.def)             Requested size: 469.76045pt x 469.76045pt.
 [5] [6pdfTeX warning (ext4): destination with the same identifier (name{figure.
 2}) has been already used, duplicate ignored
 
@@ -761,17 +761,16 @@ Package pdftex.def Info: Paper-On-NCAAB-Stats_files/figure-latex/scatters-1.pdf
                                                   \fi \fi 
 l.213 
        <./Paper-On-NCAAB-Stats_files/figure-latex/scatters-1.pdf>]
-<Paper-On-NCAAB-Stats_files/figure-latex/histograms-1.pdf, id=71, 469.755pt x 3
-25.215pt>
-File: Paper-On-NCAAB-Stats_files/figure-latex/histograms-1.pdf Graphic file (ty
-pe pdf)
-<use Paper-On-NCAAB-Stats_files/figure-latex/histograms-1.pdf>
-Package pdftex.def Info: Paper-On-NCAAB-Stats_files/figure-latex/histograms-1.p
-df  used on input line 239.
+<Paper-On-NCAAB-Stats_files/figure-latex/hists-1.pdf, id=71, 469.755pt x 325.21
+5pt>
+File: Paper-On-NCAAB-Stats_files/figure-latex/hists-1.pdf Graphic file (type pd
+f)
+<use Paper-On-NCAAB-Stats_files/figure-latex/hists-1.pdf>
+Package pdftex.def Info: Paper-On-NCAAB-Stats_files/figure-latex/hists-1.pdf  u
+sed on input line 239.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-LaTeX Warning: Reference `fig:histograms' on page 7 undefined on input line 240
-.
+LaTeX Warning: Reference `fig:hists' on page 7 undefined on input line 240.
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 239--241
@@ -788,7 +787,7 @@ l.241
 
 LaTeX Warning: Reference `fig:dags' on page 8 undefined on input line 247.
 
-[8 <./Paper-On-NCAAB-Stats_files/figure-latex/histograms-1.pdf>]
+[8 <./Paper-On-NCAAB-Stats_files/figure-latex/hists-1.pdf>]
 <Paper-On-NCAAB-Stats_files/figure-latex/dags-1.pdf, id=92, 1003.75pt x 381.425
 pt>
 File: Paper-On-NCAAB-Stats_files/figure-latex/dags-1.pdf Graphic file (type pdf
@@ -809,66 +808,75 @@ d, duplicate ignored
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
 l.286 ...}x_2 + \hat{\beta_{3}}x_3 + {\epsilon} \]
-                                                  ]
+                                                  ] [11pdfTeX warning (ext4): d
+estination with the same identifier (name{table.4}) has been already used, dupl
+icate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.335 
+      ]
+<Paper-On-NCAAB-Stats_files/figure-latex/3d-1.pdf, id=127, 469.755pt x 325.215p
+t>
+File: Paper-On-NCAAB-Stats_files/figure-latex/3d-1.pdf Graphic file (type pdf)
+<use Paper-On-NCAAB-Stats_files/figure-latex/3d-1.pdf>
+Package pdftex.def Info: Paper-On-NCAAB-Stats_files/figure-latex/3d-1.pdf  used
+ on input line 344.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+
+LaTeX Warning: Reference `fig:3d' on page 12 undefined on input line 345.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 344--346
+[][]
+ []
+
+[12]
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 3
-17.
+52.
 (/usr/share/texmf/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 318.
-LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 
-333.
-(/usr/share/texmf/tex/latex/lm/ts1lmtt.fd
-File: ts1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) [11] [12]
-<Paper-On-NCAAB-Stats_files/figure-latex/unnamed-chunk-5-1.pdf, id=132, 469.755
-pt x 325.215pt>
-File: Paper-On-NCAAB-Stats_files/figure-latex/unnamed-chunk-5-1.pdf Graphic fil
-e (type pdf)
-<use Paper-On-NCAAB-Stats_files/figure-latex/unnamed-chunk-5-1.pdf>
-Package pdftex.def Info: Paper-On-NCAAB-Stats_files/figure-latex/unnamed-chunk-
-5-1.pdf  used on input line 382.
-(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 353.
 <Paper-On-NCAAB-Stats_files/figure-latex/assumplots-1.pdf, id=133, 469.755pt x 
 578.16pt>
 File: Paper-On-NCAAB-Stats_files/figure-latex/assumplots-1.pdf Graphic file (ty
 pe pdf)
 <use Paper-On-NCAAB-Stats_files/figure-latex/assumplots-1.pdf>
 Package pdftex.def Info: Paper-On-NCAAB-Stats_files/figure-latex/assumplots-1.p
-df  used on input line 392.
+df  used on input line 359.
 (pdftex.def)             Requested size: 469.75386pt x 578.15858pt.
-[13 <./Paper-On-NCAAB-Stats_files/figure-latex/unnamed-chunk-5-1.pdf>] [14pdfTe
-X warning (ext4): destination with the same identifier (name{figure.3}) has bee
-n already used, duplicate ignored
+[13 <./Paper-On-NCAAB-Stats_files/figure-latex/3d-1.pdf>] [14pdfTeX warning (ex
+t4): destination with the same identifier (name{figure.3}) has been already use
+d, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.415 \newpage
-               <./Paper-On-NCAAB-Stats_files/figure-latex/assumplots-1.pdf>] [1
-5]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 475.
-[16]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 475.
+l.364 
+       <./Paper-On-NCAAB-Stats_files/figure-latex/assumplots-1.pdf>] [15] [16]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 449.
+[17]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 449.
 (./Paper-On-NCAAB-Stats.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 475.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 475.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 449.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 449.
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 18062 strings out of 483107
- 303188 string characters out of 5964630
- 592174 words of memory out of 5000000
- 32539 multiletter control sequences out of 15000+600000
- 627145 words of font info for 159 fonts, out of 8000000 for 9000
+ 18034 strings out of 483107
+ 302565 string characters out of 5964630
+ 592286 words of memory out of 5000000
+ 32506 multiletter control sequences out of 15000+600000
+ 627183 words of font info for 161 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
  41i,13n,42p,3019b,750s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texmf/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/share/texmf/fonts/enc/d
-vips/lm/lm-ec.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/shar
-e/texmf/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-ma
-thsy.enc}</usr/share/texmf/fonts/type1/public/lm/lmbx10.pfb></usr/share/texmf/f
+{/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf/fonts/enc/dv
+ips/lm/lm-mathsy.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/shar
+e/texmf/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/share/texmf/fonts/enc/dvips/lm/l
+m-rm.enc}</usr/share/texmf/fonts/type1/public/lm/lmbx10.pfb></usr/share/texmf/f
 onts/type1/public/lm/lmbx12.pfb></usr/share/texmf/fonts/type1/public/lm/lmbx9.p
 fb></usr/share/texmf/fonts/type1/public/lm/lmmi10.pfb></usr/share/texmf/fonts/t
 ype1/public/lm/lmmi7.pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pfb></us
@@ -877,12 +885,12 @@ lic/lm/lmr17.pfb></usr/share/texmf/fonts/type1/public/lm/lmr6.pfb></usr/share/t
 exmf/fonts/type1/public/lm/lmr7.pfb></usr/share/texmf/fonts/type1/public/lm/lmr
 8.pfb></usr/share/texmf/fonts/type1/public/lm/lmr9.pfb></usr/share/texmf/fonts/
 type1/public/lm/lmri10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb><
-/usr/share/texmf/fonts/type1/public/lm/lmtk10.pfb></usr/share/texmf/fonts/type1
-/public/lm/lmtt10.pfb>
-Output written on Paper-On-NCAAB-Stats.pdf (16 pages, 1821016 bytes).
+/usr/share/texmf/fonts/type1/public/lm/lmsy7.pfb></usr/share/texmf/fonts/type1/
+public/lm/lmtk10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt10.pfb>
+Output written on Paper-On-NCAAB-Stats.pdf (17 pages, 1816938 bytes).
 PDF statistics:
- 324 PDF objects out of 1000 (max. 8388607)
- 274 compressed objects within 3 object streams
- 62 named destinations out of 1000 (max. 500000)
+ 346 PDF objects out of 1000 (max. 8388607)
+ 294 compressed objects within 3 object streams
+ 65 named destinations out of 1000 (max. 500000)
  22655 words of extra memory for PDF output out of 24883 (max. 10000000)
 
