@@ -7,7 +7,6 @@
 
 #### Workspace setup ####
 # Use R Projects, not setwd().
-library(haven)
 library(tidyverse)
 library(janitor)
 

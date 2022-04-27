@@ -1,9 +1,9 @@
 ---
-title: "The Success of College Basketball Teams can be predicted using several advanced team statistics"
-subtitle: "A Linear Model Approach"
+title: "The Success of College Basketball Teams can be predicted using several advanced statistics"
+subtitle: "A Linear Regression Approach"
 author: 
   - Thomas D'Onofrio
-thanks: "Code and data are available at: https://github.com/TDonofrio62/Paper-On-NCAAB-Stats."
+thanks: "Code and data are available at: https://github.com/TDonofrio62/Predicting-College-Basketball-Success."
 date: "`r format(Sys.time(), '%d %B %Y')`"
 abstract: "The March Madness college basketball tournament is one of the most exciting sports events in the world due to the intense games, unpredictable results, and the creation of brackets by millions. In this paper, data displaying each college basketball schools’ advanced team statistics was used to create a linear model with Simple Rating System as the response variable, where the explanatory variables are the team statistics that play the largest factor in leading to team success. It was found that true shooting percentage, total rebound percentage, and turnover percentage are the most important team statistics that affect the amount of success a team has, meaning fans can use these statistics to fill out their brackets more successfully. Unfortunately, the data is slightly biased due to inconsistent scorekeeping across teams and arenas, and the racial biases of referees when calling fouls, causing some implications to the findings."
 output:
@@ -396,7 +396,7 @@ Table \@ref(tab:coefsum) displays the results of our model's estimated parameter
 
 Next, the slope coefficient for the true shooting percentage variable is 0.92, meaning that when all other predictor variables are held at a fixed value, if true shooting percentage increases by 1% then their simple rating system will increase by 0.92. Total rebound percentage has a slope coefficient even larger at 1.63. This coefficient value of 1.63 can be interpreted as how much a team's simple rating system increases by when their total rebound percentage goes up 1% and all other variables are fixed. Both of these coefficients make sense as simple rating system will logically increase if a team shoots more efficiently and scores more points or if they grab more rebounds and get more attempts to score that their opposition, which was already determined by looking at the relation graphically earlier. The estimated slope coefficient for turnover percentage is different from the other as it is negative, with a value of -2.04. This lines up with what was seen in the graphical analysis as simple rating system and turnover percentage have a negative relationship, since turning the ball over more will allow the other team to score more and lead to a worse SRS. This negative value tells us that when a team's turnover percentage increases by 1% and all other variables are held fixed, the team's simple rating system value will decrease by 2.04 units.
 
-We can plug all these coefficients into the $\beta's$ in the formula explained in Section \@ref(model) to get the completed formula for our final model, $\hat{y_i} = -98.62 + 0.92x_1 + 1.63x_2 - 2.04x_3$. Doing so makes our model much easier to interpret. In order to estimate what a team's simple rating system value would be, you plug in their true shooting percentage for $x_1$, their total rebound percentage for $x_2$, and their turnover percentage for $x_3$, and the output of $\hat{y_i}$ would be their rating. For example, if a team has a true shooting percentage of 50%, a total rebounding percentage of 40%, and a turnover percentage of 20%, the model estimates that their simple rating system would be $\hat{y_i} = -98.62 + 0.92(50) + 1.63(40) - 2.04(20) = -28.22$. This shows how the model can successfully predict a team's success with the use of advanced team statistics such as our predictor variables that were used, answering the research question.
+We can plug all these coefficients into the $\beta's$ in the formula explained in Section \@ref(model) to get the completed formula for our final model, $$\hat{y_i} = -98.62 + 0.92x_1 + 1.63x_2 - 2.04x_3$$. Doing so makes our model much easier to interpret. In order to estimate what a team's simple rating system value would be, you plug in their true shooting percentage for $x_1$, their total rebound percentage for $x_2$, and their turnover percentage for $x_3$, and the output of $\hat{y_i}$ would be their rating. For example, if a team has a true shooting percentage of 50%, a total rebounding percentage of 40%, and a turnover percentage of 20%, the model estimates that their simple rating system would be $\hat{y_i} = -98.62 + 0.92(50) + 1.63(40) - 2.04(20) = -28.22$. This shows how the model can successfully predict a team's success with the use of advanced team statistics such as our predictor variables that were used, answering the research question.
 
 Table \@ref(tab:coefsum) also contains 95% confidence intervals. These intervals give us a range of plausible values for each estimated coefficient, and we are 95% certain that the true population parameter value is within this interval. For example, the true shooting percentage slope coefficient can reasonably be any value between 0.77 and 1.07, and our estimated coefficient value of 0.92 for true shooting percentage falls right in the middle of this range. There is a chance this interval does not capture the true value but it is unlikely, as if we took 100 samples of college basketball data and created models, only 95% of the models and their confidence intervals for the estimated coefficients would capture the true population values. Fortunately, each of the estimated slope coefficients confidence intervals are quite narrow, as the lower and upper bounds only differ by 0.3, 0.31, and 0.45 respectively. The narrowness of the intervals is good as it means that our estimated coefficients are most likely quite accurate, and any coefficients and their confidence intervals that are estimated from other samples would give values very similar to the ones obtained from our sample that was used [@citeBassett]. The intercept coefficient also has a fairly narrow confidence interval as well, from -109.25 to -87.98, even if it may not seem like it relative to the other coefficients. This is because it is not dealing with percentage variables like the slope coefficient and instead has to do with simple rating system which has a wider range of values.
 
@@ -404,7 +404,7 @@ The final value in the summary table is the p-value of each estimated coefficien
 
 The relationship between simple rating system and our three explanatory variables can also be visualized despite being a 4D relationship, thanks to the package plot3D [@cite3D].
 
-```{r 3d, echo=FALSE, fig.cap= "4D plot showing the relationship between the models response variable, Simple Rating System, and its three predictor variables"}
+```{r 3d, echo=FALSE, fig.height=5, fig.width=6, fig.cap= "4D plot showing the relationship between the models response variable, Simple Rating System, and its three predictor variables"}
 
 #Create a 3D plot to show the relationship between Simple Rating System and its three predictor variables included in the model
 #Add two of the explanatory variables to the x-axis and y-axis, then colour in the points based on the last variable to make the plot 4-dimensional
@@ -414,6 +414,7 @@ scatter3D(ncaab_stats_train$ts_percent, ncaab_stats_train$trb_percent, ncaab_sta
           bty = 'b2', pch = 19, cex = 0.5, 
           xlab = "TS%", ylab = "TRB%", zlab = "SRS", 
           clab = "TOV%", ticktype = "detailed")
+
 ```
 
 Figure \@ref(fig:3d) shows this relationship through the use of a 3D plot, which is technically a 4D plot based on the use of a colour gradient to show a 4th variable. The vertical z-axis represents our response variable SRS, the x-axis closest to the viewer represents true shooting percentage, and the remaining y-axis on the right represents total rebound percentage. Also, the colour gradient is used to represent turnover percentage where each point is coloured in differently based on its turnover percentage value, giving the plot its 4th dimension. 
@@ -464,7 +465,7 @@ assump_plot5 <- ggplot(fitted_and_resids, aes(x = srs, .fitted)) +
        x = "Actual Simple Rating System")
 ```
 
-```{r assumplots, echo=FALSE, fig.height=8, fig.cap="Residuals and Fitted Value plots for linear regression model predicting Simple Rating System using a training dataset on college basketball statistics"}
+```{r assumplots, echo=FALSE, fig.height=7, fig.cap="Residuals and Fitted Value plots for linear regression model predicting Simple Rating System using a training dataset on college basketball statistics"}
 
 #Combine all residual plots into one figure
 ggarrange(assump_plot1,assump_plot5,assump_plot2,assump_plot3, assump_plot4, ncol=2, nrow=3)
@@ -524,7 +525,7 @@ Furthermore, as more seasons are played in the future, we will obtain more compl
 
 \appendix
 
-# Appendix {-}
+# Appendix
 
 ## Datasheet
 

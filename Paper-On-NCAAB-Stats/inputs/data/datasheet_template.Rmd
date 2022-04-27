@@ -2,7 +2,7 @@
 title: "Datasheet for dataset used in 'The Success of College Basketball Teams can be predicted using several advanced team statistics'"
 author: 
   - Thomas D'Onofrio
-thanks: "Code and data are available at: LINK."
+thanks: "Code and data are available at: https://github.com/TDonofrio62/Predicting-College-Basketball-Success."
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
   bookdown::pdf_document2
